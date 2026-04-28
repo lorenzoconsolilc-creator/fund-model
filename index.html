@@ -589,10 +589,7 @@ function calc() {
            row('Capital event fee pool', ceff) +
            row('Total fee pool', fees, true) +
            row('GP carry pool', carry) +
-           row('Total GP economics', gp, true, true) +
-           '<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px">' +
-           '<span style="color:var(--tx2)">Your share (15%)</span>' +
-           '<span style="font-family:var(--m);font-weight:500;color:var(--teal2)">' + fmtM(you) + '</span></div>';
+           row('Total GP economics', gp, true, true) ;
   }
   document.getElementById('f5-rows').innerHTML = fundRows(5);
   document.getElementById('f6-rows').innerHTML = fundRows(6);
