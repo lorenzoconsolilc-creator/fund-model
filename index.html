@@ -266,13 +266,22 @@ table.pl tr.exit-row td{background:rgba(29,158,117,.06)}
           <div id="f6-rows"></div>
         </div>
       </div>
-      <div class="card">
+<div class="card">
         <div class="ct">Fund-level LP IRR (committed capital basis)</div>
         <div class="mets">
           <div class="met green"><div class="ml">5-deal IRR</div><div class="mv" id="fi5">—</div><div class="ms">No recycling</div></div>
           <div class="met green"><div class="ml">6-deal IRR</div><div class="mv" id="fi6">—</div><div class="ms">With recycling</div></div>
           <div class="met"><div class="ml">Per-deal IRR</div><div class="mv" id="fi-deal">—</div><div class="ms">Benchmark</div></div>
           <div class="met"><div class="ml">Fund MoIC (6)</div><div class="mv" id="fi-moic">—</div><div class="ms">Total return</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">Fund-level LP IRR (two capital calls — 50% T0, 50% month 12)</div>
+        <div class="mets">
+          <div class="met green"><div class="ml">5-deal IRR</div><div class="mv" id="fi5b">—</div><div class="ms">No recycling</div></div>
+          <div class="met green"><div class="ml">6-deal IRR</div><div class="mv" id="fi6b">—</div><div class="ms">With recycling</div></div>
+          <div class="met"><div class="ml">Per-deal IRR</div><div class="mv" id="fi-dealb">—</div><div class="ms">Benchmark</div></div>
+          <div class="met"><div class="ml">Fund MoIC (6)</div><div class="mv" id="fi-moicb">—</div><div class="ms">Total return</div></div>
         </div>
       </div>
     </div>
@@ -619,10 +628,40 @@ function calc() {
   const fi5v  = irrHalf(buildFundCFs(false));
   const fi6v  = irrHalf(buildFundCFs(true));
   const moic6v = (5 * lpRet + lpRet) / 15e6;
-  document.getElementById('fi5').textContent     = pct(fi5v);
+document.getElementById('fi5').textContent     = pct(fi5v);
   document.getElementById('fi6').textContent     = pct(fi6v);
   document.getElementById('fi-deal').textContent = pct(lpIRR);
   document.getElementById('fi-moic').textContent = moic6v.toFixed(2) + 'x';
+
+  // Two capital calls: 50% at T=0, 50% at month 12 (year 0.5 in half-year periods)
+  function buildFundCFs2call(withRecycled) {
+    const cf = new Array(15).fill(0);
+    cf[0] -= 7.5e6;   // first call: 50% at T=0
+    cf[1] -= 7.5e6;   // second call: 50% at month 12 (period 1 in half-year steps)
+    [0,1,2,3,4].forEach(ds => {
+      yrData.forEach((y, yi) => {
+        const c2 = y.lpcf * lps / 2;
+        if (ds+yi*2 < 15)   cf[ds+yi*2]   += c2;
+        if (ds+yi*2+1 < 15) cf[ds+yi*2+1] += c2;
+      });
+      if (ds + 8 < 15) cf[ds + 8] += lpRet;
+    });
+    if (withRecycled) {
+      yrData.forEach((y, yi) => {
+        const c2 = y.lpcf * lps / 2;
+        if (6+yi*2 < 15)   cf[6+yi*2]   += c2;
+        if (6+yi*2+1 < 15) cf[6+yi*2+1] += c2;
+      });
+      if (14 < 15) cf[14] += lpRet;
+    }
+    return cf;
+  }
+  const fi5bv  = irrHalf(buildFundCFs2call(false));
+  const fi6bv  = irrHalf(buildFundCFs2call(true));
+  document.getElementById('fi5b').textContent     = pct(fi5bv);
+  document.getElementById('fi6b').textContent     = pct(fi6bv);
+  document.getElementById('fi-dealb').textContent = pct(lpIRR);
+  document.getElementById('fi-moicb').textContent = moic6v.toFixed(2) + 'x';
 
   // Sensitivity
   function sensNOI(noi2, cap2) {
