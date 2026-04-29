@@ -352,7 +352,7 @@ function st(id, btn) {
 }
 
 function fmtM(n) { const a = Math.abs(n); const s = n < 0 ? '-' : ''; return s + (a >= 1e6 ? '$' + (a / 1e6).toFixed(2) + 'M' : '$' + Math.round(a / 1000) + 'K'); }
-function fmtK(n) { const a = Math.abs(n); return (n < 0 ? '(' : '') + '$' + Math.round(a).toLocaleString() + (n < 0 ? ')' : ''); }
+function fmtK(n) { const a = Math.abs(n); return (n < 0 ? '-' : '') + '$' + Math.round(a).toLocaleString(); }
 function pct(n) { return (n * 100).toFixed(1) + '%'; }
 function fx(n) { return (n * 100).toFixed(2) + '%'; }
 
